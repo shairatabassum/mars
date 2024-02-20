@@ -171,6 +171,7 @@ events.out.*
 
 # Data
 # data
+data/
 # !*/data
 # !docs/reference/api/data/
 
