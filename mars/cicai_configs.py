@@ -22,7 +22,7 @@ from nerfstudio.engine.trainer import TrainerConfig
 from nerfstudio.plugins.types import MethodSpecification
 
 MAX_NUM_ITERATIONS = 600000
-STEPS_PER_SAVE = 2000
+STEPS_PER_SAVE = 500
 STEPS_PER_EVAL_IMAGE = 500
 STEPS_PER_EVAL_ALL_IMAGES = 5000
 
@@ -157,10 +157,10 @@ Ablation_no_depth_kitti = MethodSpecification(
                     use_car_latents=True,
                     use_depth=False,
                     car_object_latents_path=Path(
-                        "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/latent_codes_car_van_truck.pt"
+                        "./data/extra/kitti-mot/latent_codes05.pt"
                     ),
                     split_setting="reconstruction",
-                    car_nerf_state_dict_path=Path("/DATA_EDS/liuty/ckpts/pretrain/car_nerf/epoch_670.ckpt"),
+                    car_nerf_state_dict_path=Path("./data/extra/kitti-mot/epoch_670.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,
@@ -267,11 +267,11 @@ VKITTI_Recon_Mars_Car_Depth = MethodSpecification(
                     use_car_latents=True,
                     use_depth=True,
                     car_object_latents_path=Path(
-                        "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/latents/latent_codes06.pt"
+                        "./data/extra/vkitti/latent_codes06.pt"
                         # "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/latents/latent_codes02.pt"
                     ),
                     split_setting="reconstruction",
-                    car_nerf_state_dict_path=Path("/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/epoch_805.ckpt"),
+                    car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,
@@ -317,10 +317,10 @@ VKITTI_NVS_Mars_Car_Depth = MethodSpecification(
                     use_car_latents=True,
                     use_depth=True,
                     car_object_latents_path=Path(
-                        "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/latents/latent_codes06.pt"
+                        "./data/extra/vkitti/latent_codes06.pt"
                     ),
                     split_setting="nvs-75",
-                    car_nerf_state_dict_path=Path("/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/epoch_805.ckpt"),
+                    car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,

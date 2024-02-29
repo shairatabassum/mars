@@ -110,7 +110,7 @@ def dummy_kitti_files(data_dir, cam_num):
         frameID = 0
         cameraID = 0
         for i, image_file in enumerate(images):
-            f.write(f"{frameID} {cameraID} 0 0 0 0 0 0 0 0 True\n")
+            f.write(f"{frameID} {cameraID} 0 0 0 0 0 0 0 0 False\n")
             cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0

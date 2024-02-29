@@ -870,7 +870,7 @@ class MarsKittiDataParserConfig(DataParserConfig):
     """target class to instantiate"""
     data: Path = Path("data/kitti/training/image_02/0006")
     """Directory specifying location of data."""
-    scale_factor: float = 1
+    scale_factor: float = 0.1
     """How much to scale the camera origins by."""
     scene_scale: float = 1.0
     """How much to scale the region of interest by."""
@@ -878,7 +878,7 @@ class MarsKittiDataParserConfig(DataParserConfig):
     """alpha color of background"""
     first_frame: int = 65
     """specifies the beginning of a sequence if not the complete scene is taken as Input"""
-    last_frame: int = 120
+    last_frame: int = 296
     """specifies the end of a sequence"""
     use_object_properties: bool = True
     """ use pose and properties of visible objects as an input """
