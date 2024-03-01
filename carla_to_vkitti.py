@@ -76,25 +76,34 @@ def camera_intrinsics(data_dir, cam_num, fov):
                 cameraID = 0
                 frameID+=1
     print("Saved camera intrinsics!")
+
+#this function extracts numeric part of image file name for sorting JSON file
+def extract_numeric(file_path):
+    return int(file_path.split('_')[-1].split('.')[0])
     
 def camera_extrinsics(data_dir, cam_num):
     with open(data_dir, 'r') as file:
         data = json.load(file)
-    transform_matrices = [frame['transform_matrix'] for frame in data['frames']]
+        
+    # COLMAP might generate transform file in non-sorted order
+    sorted_frames = sorted(data['frames'], key=lambda x: extract_numeric(x['file_path']))
+    transform_matrices = [frame['transform_matrix'] for frame in sorted_frames]
     
     #calculating camera extrinsics
     flattened_matrices = []
     for matrix in transform_matrices:
         flattened_matrix = [str(value) for row in matrix for value in row]
         flattened_matrices.append(flattened_matrix)
-
+    
     with open('./data/CarlaDataset/extrinsic.txt', 'w') as file:
         file.write("frame cameraID r1,1 r1,2 r1,3 t1 r2,1 r2,2 r2,3 t2 r3,1 r3,2 r3,3 t3 0 0 0 1\n")
         frameID = 0
         cameraID = 0
         for matrix in flattened_matrices:
             ext = ' '.join(matrix)
-            file.write(f"{frameID} {cameraID} {ext}\n")
+            file.write(f"{frameID} 0 {ext}\n")
+            cameraID+=1
+            file.write(f"{frameID} 1 {ext}\n")
             cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0
@@ -137,7 +146,7 @@ if __name__ == "__main__":
     cam_num = args.cam_num
     fov = args.fov
 
-    copy_depth(depth_dir, cam_num)
+    #copy_depth(depth_dir, cam_num)
     camera_intrinsics(image_dir, cam_num, fov)
     camera_extrinsics(transform_dir, cam_num)
     dummy_kitti_files(image_dir, cam_num)

@@ -319,15 +319,15 @@ class MarsVKittiDataParserConfig(DataParserConfig):
     """target class to instantiate"""
     data: Path = Path("/data1/vkitti/Scene06/clone")
     """Directory specifying location of data."""
-    scale_factor: float = 0.015 #initial 0.1, carla tuned 0.015
+    scale_factor: float = 0.1
     """How much to scale the camera origins by."""
-    scene_scale: float = 1.3
+    scene_scale: float = 2.0
     """How much to scale the region of interest by."""
     alpha_color: str = "white"
     """alpha color of background"""
     first_frame: int = 0
     """specifies the beginning of a sequence if not the complete scene is taken as Input"""
-    last_frame: int = 547
+    last_frame: int = 237
     """specifies the end of a sequence"""
     use_object_properties: bool = True
     """ use pose and properties of visible objects as an input """
@@ -490,22 +490,19 @@ class MarsVKittiParser(DataParser):
                         extrinsics.append(ext)
 
                         # Get camera pose and location from extrinsics
-                        # pose = np.zeros([4, 4])
-                        # pose[3, 3] = 1
-                        # R = np.transpose(ext[:3, :3])
-                        # t = -ext[:3, -1]
+                        pose = np.zeros([4, 4])
+                        pose[3, 3] = 1
+                        R = np.transpose(ext[:3, :3])
+                        t = -ext[:3, -1]
 
-                        # # Camera position described in world coordinates
-                        # pose[:3, -1] = np.matmul(R, t)
-                        # print("This is a pose matrix: ")
-                        # print(ext)
-                        # # Match OpenGL definition of Z
-                        # pose[:3, :3] = np.matmul(np.eye(3), np.matmul(np.eye(3), R))
-                        # # Rotate pi around Z
-                        # pose[:3, 2] = -pose[:3, 2]
-                        # pose[:3, 1] = -pose[:3, 1]
-                        # poses.append(ext)
-                        poses = extrinsics
+                        # Camera position described in world coordinates
+                        pose[:3, -1] = np.matmul(R, t)
+                        # Match OpenGL definition of Z
+                        pose[:3, :3] = np.matmul(np.eye(3), np.matmul(np.eye(3), R))
+                        # Rotate pi around Z
+                        pose[:3, 2] = -pose[:3, 2]
+                        pose[:3, 1] = -pose[:3, 1]
+                        poses.append(pose)
                         frame_id.append([frame_num, cam, 0])
 
                         count.append(len(imgs) - 1)

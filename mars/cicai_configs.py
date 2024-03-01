@@ -8,6 +8,8 @@ import tyro
 from mars.data.mars_datamanager import MarsDataManagerConfig
 from mars.data.mars_kitti_dataparser import MarsKittiDataParserConfig
 from mars.data.mars_vkitti_dataparser import MarsVKittiDataParserConfig
+from mars.data.mars_carla_dataparser import MarsCarlaDataParserConfig
+from mars.data.mars_naplab_dataparser import MarsNapLabDataParserConfig
 from mars.mars_pipeline import MarsPipelineConfig
 from mars.models.car_nerf import CarNeRF, CarNeRFModelConfig
 from mars.models.mipnerf import MipNerfModel
@@ -263,7 +265,7 @@ VKITTI_Recon_Mars_Car_Depth = MethodSpecification(
         log_gradients=True,
         pipeline=MarsPipelineConfig(
             datamanager=MarsDataManagerConfig(
-                dataparser=MarsVKittiDataParserConfig(
+                dataparser=MarsCarlaDataParserConfig(
                     use_car_latents=True,
                     use_depth=True,
                     car_object_latents_path=Path(
@@ -873,14 +875,14 @@ Ablation_no_depth = MethodSpecification(
         log_gradients=True,
         pipeline=MarsPipelineConfig(
             datamanager=MarsDataManagerConfig(
-                dataparser=MarsVKittiDataParserConfig(
+                dataparser=MarsNapLabDataParserConfig(
                     use_car_latents=True,
                     use_depth=False,
                     car_object_latents_path=Path(
-                        "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/latents/latent_codes06.pt"
+                        "./data/extra/vkitti/latent_codes06.pt"
                     ),
                     split_setting="reconstruction",
-                    car_nerf_state_dict_path=Path("/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/epoch_805.ckpt"),
+                    car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,
