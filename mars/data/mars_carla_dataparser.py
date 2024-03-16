@@ -675,6 +675,8 @@ class MarsCarlaParser(DataParser):
             )
 
         print("finished data parsing")
+        with open('./parser.txt', "w") as file:
+            file.write(str(dataparser_outputs))
         return dataparser_outputs
 
 

@@ -169,6 +169,8 @@ renders/
 # tensorboard log files
 events.out.*
 
+/im2vid.py
+
 # Data
 # data
 /data/

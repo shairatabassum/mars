@@ -319,7 +319,7 @@ class MarsNapLabDataParserConfig(DataParserConfig):
     """target class to instantiate"""
     data: Path = Path("/data1/vkitti/Scene06/clone")
     """Directory specifying location of data."""
-    scale_factor: float = 0.8
+    scale_factor: float = 1.0
     """How much to scale the camera origins by."""
     scene_scale: float = 4
     """How much to scale the region of interest by."""
@@ -487,10 +487,28 @@ class MarsNapLabParser(DataParser):
 
                         ext = extrinsic[frame_num * n_cam : frame_num * n_cam + n_cam, :][cam][2:]
                         ext = np.reshape(ext, (-1, 4))
+                        
+                        #OpenCV (COLMAP) to OpenGL conversion
+                        # ext[0:3, 1:3] *= -1
+                        # ext = ext[np.array([0, 2, 1, 3]), :]
+                        # ext[2, :] *= -1
+
+                        # PROCESS 2
+                        # ext = ext @ np.diag([1, -1, -1, 1])
+
+                        # PROCESS 3
+                        # poses = poses @ np.diag([1, -1, -1, 1])
+
+                        # PROCESS 4
+                        # ext[0:3, 1:3] *= -1  # switch cam coord x,y
+                        # ext = ext[[1, 0, 2], :]  # switch world x,y
+                        # ext[2, :] *= -1  # invert world z
+
                         extrinsics.append(ext)
                         poses = extrinsics
-                        frame_id.append([frame_num, cam, 0])
+                        
 
+                        frame_id.append([frame_num, cam, 0])
                         count.append(len(imgs) - 1)
 
         # imgs = (np.array(imgs) / 255.0).astype(np.float32)

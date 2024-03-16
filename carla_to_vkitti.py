@@ -12,7 +12,6 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_dir", type=str)
 parser.add_argument("--cam_num", type=int)
-parser.add_argument("--fov", type=int)
 
 def copy_depth(depth_dir, cam_num):
     #reading all images and depth
@@ -35,7 +34,7 @@ def copy_depth(depth_dir, cam_num):
             newDepthID+=1
     
         
-def camera_intrinsics(data_dir, cam_num, fov):
+def camera_intrinsics(data_dir, transform_dir, cam_num):
     #reading all images and depth
     images = sorted([f for f in os.listdir(data_dir) if f.endswith('.jpg') or f.endswith('.png')])
     
@@ -56,22 +55,32 @@ def camera_intrinsics(data_dir, cam_num, fov):
             newImageID+=1
     
     #calculating camera intrinsics
+    with open(transform_dir, 'r') as file:
+        data = json.load(file)
+        
+    fx = data['fl_x']
+    fy = data['fl_y']
+    cx = data['cx']
+    cy = data['cy']
+    
     with open('./data/CarlaDataset/intrinsic.txt', 'w') as f:
         f.write("frame cameraID K[0,0] K[1,1] K[0,2] K[1,2]\n")
         frameID = 0
         cameraID = 0
         for i, image_file in enumerate(images):
-            image_path = os.path.join(data_dir, image_file)
-            img = cv2.imread(image_path)
-            cx = img.shape[1] // 2
-            cy = img.shape[0] // 2
-            width = img.shape[1]
-            height = img.shape[0]
-            fov_rad = np.deg2rad(fov)
-            fx = width / (2 * np.tan(fov_rad / 2))
-            fy = width / (2 * np.tan(fov_rad / 2))
-            f.write(f"{frameID} {cameraID} {fx} {fy} {cx} {cy}\n")
+            #image_path = os.path.join(data_dir, image_file)
+            #img = cv2.imread(image_path)
+            #cx = img.shape[1] // 2
+            #cy = img.shape[0] // 2
+            #width = img.shape[1]
+            #height = img.shape[0]
+            #fov_rad = np.deg2rad(fov)
+            #fx = width / (2 * np.tan(fov_rad / 2))
+            #fy = width / (2 * np.tan(fov_rad / 2))
+            f.write(f"{frameID} 0 {fx} {fy} {cx} {cy}\n")
             cameraID+=1
+            #f.write(f"{frameID} 1 {fx} {fy} {cx} {cy}\n")
+            #cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0
                 frameID+=1
@@ -103,8 +112,8 @@ def camera_extrinsics(data_dir, cam_num):
             ext = ' '.join(matrix)
             file.write(f"{frameID} 0 {ext}\n")
             cameraID+=1
-            file.write(f"{frameID} 1 {ext}\n")
-            cameraID+=1
+            #file.write(f"{frameID} 1 {ext}\n")
+            #cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0
                 frameID+=1
@@ -144,10 +153,9 @@ if __name__ == "__main__":
     depth_dir = os.path.join(args.data_dir, "depth")
     transform_dir = os.path.join(args.data_dir, "transforms.json")
     cam_num = args.cam_num
-    fov = args.fov
 
-    #copy_depth(depth_dir, cam_num)
-    camera_intrinsics(image_dir, cam_num, fov)
+    copy_depth(depth_dir, cam_num)
+    camera_intrinsics(image_dir, transform_dir, cam_num)
     camera_extrinsics(transform_dir, cam_num)
     dummy_kitti_files(image_dir, cam_num)
 

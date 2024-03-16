@@ -85,6 +85,9 @@ def extract_object_information(args, visible_objects, objects_meta):
     # [n_frames, n_max_obj]
     obj_track_id = obj_state[..., 3][..., None]
     obj_class_id = obj_state[..., 4][..., None]
+    print("==========================================")
+    print(obj_track_id)
+    print(obj_class_id)
     # Change track_id to row in list(objects_meta)
     obj_meta_ls = list(objects_meta.values())  # object_id, length, height, width, class_id
     # Add first row for no objects
