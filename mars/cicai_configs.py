@@ -15,6 +15,7 @@ from mars.models.car_nerf import CarNeRF, CarNeRFModelConfig
 from mars.models.mipnerf import MipNerfModel
 from mars.models.nerfacto import NerfactoModelConfig
 from mars.models.scene_graph import SceneGraphModelConfig
+from mars.models.scene_graph_opengl import SceneGraphModelConfigOpenGL
 from mars.models.semantic_nerfw import SemanticNerfWModelConfig
 from mars.models.vanilla_nerf import NeRFModel, VanillaModelConfig
 from nerfstudio.cameras.camera_optimizers import CameraOptimizerConfig
@@ -576,16 +577,18 @@ Ablation_object_wise_NeRFacto = MethodSpecification(
         log_gradients=True,
         pipeline=MarsPipelineConfig(
             datamanager=MarsDataManagerConfig(
-                dataparser=MarsVKittiDataParserConfig(
-                    use_car_latents=False,
+                dataparser=MarsCarlaDataParserConfig(
+                    use_car_latents=True,
                     use_depth=True,
+                    car_object_latents_path=Path("./data/extra/vkitti/latent_codes06.pt"),
                     split_setting="reconstruction",
+                    car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,
                 camera_optimizer=CameraOptimizerConfig(mode="off"),
             ),
-            model=SceneGraphModelConfig(
+            model=SceneGraphModelConfigOpenGL(
                 background_model=NerfactoModelConfig(),
                 object_model_template=NerfactoModelConfig(),
                 object_representation="object-wise",
@@ -727,14 +730,14 @@ Ablation_class_wise_NeRFacto = MethodSpecification(
         log_gradients=True,
         pipeline=MarsPipelineConfig(
             datamanager=MarsDataManagerConfig(
-                dataparser=MarsVKittiDataParserConfig(
+                dataparser=MarsCarlaDataParserConfig(
                     use_car_latents=True,
                     use_depth=True,
                     car_object_latents_path=Path(
-                        "/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/latents/latent_codes06.pt"
+                        "./data/extra/vkitti/latent_codes06.pt"
                     ),
                     split_setting="reconstruction",
-                    car_nerf_state_dict_path=Path("/DATA_EDS/liuty/ckpts/pretrain/car_nerf/vkitti/epoch_805.ckpt"),
+                    car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
                 ),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,

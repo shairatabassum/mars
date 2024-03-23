@@ -36,7 +36,7 @@ from mars.model_components.losses import monosdf_depth_loss
 from mars.models.nerfacto import NerfactoModel, NerfactoModelConfig
 from mars.models.semantic_nerfw import SemanticNerfWModel
 from mars.models.sky_model import SkyModelConfig
-from mars.utils.neural_scene_graph_helper import box_pts, combine_z, world2object
+from mars.utils.neural_scene_graph_helper_opengl import box_pts, combine_z, world2object
 from nerfstudio.cameras.rays import Frustums, RayBundle, RaySamples
 from nerfstudio.data.dataparsers.base_dataparser import Semantics
 from nerfstudio.data.scene_box import SceneBox
@@ -73,7 +73,7 @@ _type2str = ["Car", None, "Truck"]
 
 
 @dataclass
-class SceneGraphModelConfig(ModelConfig):
+class SceneGraphModelConfigOpenGL(ModelConfig):
     """Neural Scene Graph Model Config"""
 
     _target: Type = field(default_factory=lambda: SceneGraphModel)
@@ -140,7 +140,7 @@ class SceneGraphModel(Model):
         config: Scene graph configuration to instantiate model
     """
 
-    config: SceneGraphModelConfig
+    config: SceneGraphModelConfigOpenGL
     object_meta: Dict
     obj_feat_dim: Optional[int]
     car_latents: Optional[Dict]

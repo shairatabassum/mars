@@ -20,7 +20,9 @@ from pathlib import Path
 from typing import List, Optional, Type
 
 import imageio
+import sys
 import numpy as np
+np.set_printoptions(threshold=sys.maxsize)
 import pandas as pd
 import torch
 from PIL import Image
@@ -251,7 +253,8 @@ def _get_scene_objects(basedir):
         vehicle_dim = object_pose[np.where(object_pose[:, 2] == track_id), :][0, 0, 4:7]
         # For vkitti2 dimensions are defined: width height length
         # To Match vehicle axis xyz swap to length, height, width
-        vehicle_dim = vehicle_dim[[2, 1, 0]]
+        vehicle_dim = vehicle_dim[[1, 0, 2]]
+        # vehicle_dim = vehicle_dim[[2, 0, 1]]
 
         # vehicle = np.concatenate((np.concatenate((np.concatenate((track_id, label)), model)), color))
         vehicle = np.concatenate([track_id, vehicle_dim])
@@ -323,7 +326,7 @@ class MarsCarlaDataParserConfig(DataParserConfig):
     """target class to instantiate"""
     data: Path = Path("/data1/vkitti/Scene06/clone")
     """Directory specifying location of data."""
-    scale_factor: float = 0.015
+    scale_factor: float = 0.09 #0.09 #0.015
     """How much to scale the camera origins by."""
     scene_scale: float = 1.3
     """How much to scale the region of interest by."""
@@ -331,7 +334,7 @@ class MarsCarlaDataParserConfig(DataParserConfig):
     """alpha color of background"""
     first_frame: int = 0
     """specifies the beginning of a sequence if not the complete scene is taken as Input"""
-    last_frame: int = 548
+    last_frame: int = 102
     """specifies the end of a sequence"""
     use_object_properties: bool = True
     """ use pose and properties of visible objects as an input """
@@ -493,6 +496,22 @@ class MarsCarlaParser(DataParser):
                         ext = np.reshape(ext, (-1, 4))
                         extrinsics.append(ext)
                         poses = extrinsics
+                        
+                        # # Get camera pose and location from extrinsics
+                        # pose = np.zeros([4, 4])
+                        # pose[3, 3] = 1
+                        # R = np.transpose(ext[:3, :3])
+                        # t = -ext[:3, -1]
+
+                        # # Camera position described in world coordinates
+                        # pose[:3, -1] = np.matmul(R, t)
+                        # # Match OpenGL definition of Z
+                        # pose[:3, :3] = np.matmul(np.eye(3), np.matmul(np.eye(3), R))
+                        # # Rotate pi around Z
+                        # pose[:3, 2] = -pose[:3, 2]
+                        # pose[:3, 1] = -pose[:3, 1]
+                        # poses.append(pose)
+                        
                         frame_id.append([frame_num, cam, 0])
 
                         count.append(len(imgs) - 1)
@@ -509,8 +528,12 @@ class MarsCarlaParser(DataParser):
         visible_objects, object_meta, max_objects_per_frame = _get_objects_by_frame(
             object_pose, object_meta, max_objects_per_frame, n_cam, self.selected_frames, row_id
         )
+        
+        with open('./objmeta.txt', "w+") as file:
+            file.write(str(object_meta))
 
         visible_objects = np.array(visible_objects)
+        
         # TODO: Undo for final version, now speed up and overfit on less objects
         visible_objects = visible_objects[:, :max_objects_per_frame, :]
 
@@ -675,8 +698,7 @@ class MarsCarlaParser(DataParser):
             )
 
         print("finished data parsing")
-        with open('./parser.txt', "w") as file:
-            file.write(str(dataparser_outputs))
+        
         return dataparser_outputs
 
 

@@ -491,6 +491,8 @@ class MarsVKittiParser(DataParser):
                         ext = extrinsic[frame_num * n_cam : frame_num * n_cam + n_cam, :][cam][2:]
                         ext = np.reshape(ext, (-1, 4))
                         extrinsics.append(ext)
+                        print("===================")
+                        print(ext)
 
                         # Get camera pose and location from extrinsics
                         pose = np.zeros([4, 4])
@@ -506,6 +508,7 @@ class MarsVKittiParser(DataParser):
                         pose[:3, 2] = -pose[:3, 2]
                         pose[:3, 1] = -pose[:3, 1]
                         poses.append(pose)
+                        print(pose)
                         frame_id.append([frame_num, cam, 0])
 
                         count.append(len(imgs) - 1)

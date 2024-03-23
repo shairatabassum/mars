@@ -50,3 +50,4 @@ ablation-no-depth-kitti = 'mars.cicai_configs:Ablation_no_depth_kitti'
 [project.entry-points.'nerfstudio.dataparser_configs']
 KittiData = 'mars.data.mars_kitti_dataparser:KittiParserSpec'
 VKittiData = 'mars.data.mars_vkitti_dataparser:VKittiParserSpec'
+CarlaData = 'mars.data.mars_carla_dataparser:CarlaParserSpec'

@@ -353,11 +353,13 @@ class RenderTrajectory:
         # camera_path = pipeline.datamanager.eval_dataset.cameras
         # camera_path = pipeline.datamanager.train_dataset.cameras
         
-        # For generating camera path from Nerfstudio-JSON file
+        # DEFINE LOCATION
         with open("camera_paths/camera_path_small.json", "r", encoding="utf-8") as f:
             camera_data = json.load(f)
+            
+        # ==================================================================== 
+        # For generating camera path from Nerfstudio-generated camera path JSON file
         camera_to_world_matrices = [np.array(cam['camera_to_world']) for cam in camera_data['camera_path']]
-        
         deg=np.radians(85)
         for i, matrix in enumerate(camera_to_world_matrices):
             matrix = matrix.reshape(4,4)
@@ -365,15 +367,30 @@ class RenderTrajectory:
             matrix[0:3, 0:3] = matrix[0:3, 0:3] @ np.array([[np.cos(deg), -np.sin(deg), 0],[np.sin(deg), np.cos(deg),0],[0,0,1]])
             matrix[:2,3] -= 0.05 #for altered path
             camera_data['camera_path'][i]['camera_to_world'] = [item for sublist in matrix for item in sublist]
-
-        with open('camera_paths/camera_path_2.json', 'w') as f:
-            json.dump(camera_data, f, indent=4)
-
+        
         seconds = camera_data["seconds"]
         camera_type = CameraType.FISHEYE
         render_width = camera_data["render_width"]
         render_height = camera_data["render_height"]
         camera_path = get_path_from_json(camera_data)
+        print(camera_path)
+
+        with open('camera_paths/camera_path_2.json', 'w') as f:
+            json.dump(camera_data, f, indent=4)
+        
+        # ==================================================================== 
+        # For generating camera path from COLMAP generated transform JSON file
+        # camera_to_world_matrices = []
+        # for frame in camera_data['camera_path']:
+        #     camera_to_world_matrices.append(frame['camera_to_world'])
+        
+        # seconds = camera_data["seconds"]
+        # camera_type = CameraType.FISHEYE
+        # render_width = camera_data["w"]
+        # render_height = camera_data["h"]
+        # camera_path = get_path_from_json(camera_data)
+
+        
 
         # print(camera_path)
         # render_width = int(camera_path.cx[0] * 2)
