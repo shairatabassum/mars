@@ -326,7 +326,7 @@ class MarsCarlaDataParserConfig(DataParserConfig):
     """target class to instantiate"""
     data: Path = Path("/data1/vkitti/Scene06/clone")
     """Directory specifying location of data."""
-    scale_factor: float = 0.09 #0.09 #0.015
+    scale_factor: float = 0.015 #0.09 #0.015
     """How much to scale the camera origins by."""
     scene_scale: float = 1.3
     """How much to scale the region of interest by."""
@@ -528,9 +528,6 @@ class MarsCarlaParser(DataParser):
         visible_objects, object_meta, max_objects_per_frame = _get_objects_by_frame(
             object_pose, object_meta, max_objects_per_frame, n_cam, self.selected_frames, row_id
         )
-        
-        with open('./objmeta.txt', "w+") as file:
-            file.write(str(object_meta))
 
         visible_objects = np.array(visible_objects)
         
