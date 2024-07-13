@@ -13,6 +13,7 @@ from mars.data.mars_naplab_dataparser import MarsNapLabDataParserConfig
 from mars.mars_pipeline import MarsPipelineConfig
 from mars.models.car_nerf import CarNeRF, CarNeRFModelConfig
 from mars.models.mipnerf import MipNerfModel
+from mars.models.zipnerf import ZipNeRFModel, ZipNeRFModelConfig
 from mars.models.nerfacto import NerfactoModelConfig
 from mars.models.scene_graph import SceneGraphModelConfig
 from mars.models.scene_graph_opengl import SceneGraphModelConfigOpenGL
@@ -24,10 +25,10 @@ from nerfstudio.engine.schedulers import ExponentialDecaySchedulerConfig
 from nerfstudio.engine.trainer import TrainerConfig
 from nerfstudio.plugins.types import MethodSpecification
 
-MAX_NUM_ITERATIONS = 600000
+MAX_NUM_ITERATIONS = 40500 #600000
 STEPS_PER_SAVE = 500
 STEPS_PER_EVAL_IMAGE = 500
-STEPS_PER_EVAL_ALL_IMAGES = 5000
+STEPS_PER_EVAL_ALL_IMAGES = 20000
 
 VKITTI_Recon_Mars_Car_Depth_Semantic = MethodSpecification(
     config=TrainerConfig(
@@ -564,13 +565,60 @@ Ablation_object_wise_MipNeRF = MethodSpecification(
     description="Neural Scene Graph implementation with vanilla-NeRF model for backgruond and object models.",
 )
 
+# Ablation_object_wise_NeRFacto = MethodSpecification(
+#     config=TrainerConfig(
+#         method_name="ablation-object-wise-nerfacto",
+#         steps_per_eval_image=STEPS_PER_EVAL_IMAGE,
+#         steps_per_eval_all_images=STEPS_PER_EVAL_ALL_IMAGES,
+#         steps_per_save=STEPS_PER_SAVE,
+#         save_only_latest_checkpoint=False,
+#         max_num_iterations=MAX_NUM_ITERATIONS,
+#         mixed_precision=False,
+#         use_grad_scaler=True,
+#         log_gradients=True,
+#         pipeline=MarsPipelineConfig(
+#             datamanager=MarsDataManagerConfig(
+#                 dataparser=MarsCarlaDataParserConfig(
+#                     use_car_latents=True,
+#                     use_depth=True,
+#                     car_object_latents_path=Path("./data/extra/vkitti/latent_codes06.pt"),
+#                     split_setting="reconstruction",
+#                     car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
+#                 ),
+#                 train_num_rays_per_batch=4096,
+#                 eval_num_rays_per_batch=4096,
+#                 camera_optimizer=CameraOptimizerConfig(mode="off"),
+#             ),
+#             model=SceneGraphModelConfigOpenGL(
+#                 background_model=NerfactoModelConfig(),
+#                 object_model_template=NerfactoModelConfig(),
+#                 object_representation="object-wise",
+#                 object_ray_sample_strategy="remove-bg",
+#             ),
+#         ),
+#         optimizers={
+#             "background_model": {
+#                 "optimizer": RAdamOptimizerConfig(lr=1e-3, eps=1e-15),
+#                 "scheduler": ExponentialDecaySchedulerConfig(lr_final=1e-5, max_steps=200000),
+#             },
+#             "object_model": {
+#                 "optimizer": RAdamOptimizerConfig(lr=5e-3, eps=1e-15),
+#                 "scheduler": ExponentialDecaySchedulerConfig(lr_final=1e-5, max_steps=200000),
+#             },
+#         },
+#         # viewer=ViewerConfig(num_rays_per_chunk=1 << 15),
+#         vis="wandb",
+#     ),
+#     description="Neural Scene Graph implementation with vanilla-NeRF model for backgruond and object models.",
+# )
+
 Ablation_object_wise_NeRFacto = MethodSpecification(
     config=TrainerConfig(
         method_name="ablation-object-wise-nerfacto",
         steps_per_eval_image=STEPS_PER_EVAL_IMAGE,
         steps_per_eval_all_images=STEPS_PER_EVAL_ALL_IMAGES,
         steps_per_save=STEPS_PER_SAVE,
-        save_only_latest_checkpoint=False,
+        save_only_latest_checkpoint=True,
         max_num_iterations=MAX_NUM_ITERATIONS,
         mixed_precision=False,
         use_grad_scaler=True,
@@ -578,21 +626,21 @@ Ablation_object_wise_NeRFacto = MethodSpecification(
         pipeline=MarsPipelineConfig(
             datamanager=MarsDataManagerConfig(
                 dataparser=MarsCarlaDataParserConfig(
-                    use_car_latents=True,
+                    use_car_latents=False,
                     use_depth=True,
+                    #use_semantic=True,
                     car_object_latents_path=Path("./data/extra/vkitti/latent_codes06.pt"),
                     split_setting="reconstruction",
                     car_nerf_state_dict_path=Path("./data/extra/vkitti/epoch_805.ckpt"),
+                    #semantic_path=Path("../carlo/runs_mars/first_seg_maps/frames/classSegmentation"),
                 ),
-                train_num_rays_per_batch=4096,
+                train_num_rays_per_batch=4096*4,
                 eval_num_rays_per_batch=4096,
                 camera_optimizer=CameraOptimizerConfig(mode="off"),
             ),
             model=SceneGraphModelConfigOpenGL(
-                background_model=NerfactoModelConfig(),
-                object_model_template=NerfactoModelConfig(),
-                object_representation="object-wise",
-                object_ray_sample_strategy="remove-bg",
+                background_model=ZipNeRFModelConfig(),
+                object_model_template=ZipNeRFModelConfig(),
             ),
         ),
         optimizers={

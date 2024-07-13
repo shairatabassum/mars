@@ -315,6 +315,25 @@
         "renders/meng_output.mp4"
       ]
     },
+    {
+      "name": "debug_dataparser",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "nerfstudio/nerfstudio/scripts/train.py",
+      "cwd": ".",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "3"
+      },
+      "args": [
+        "ablation-object-wise-nerfacto",
+        "--data",
+        "../carlo/runs_mars/single_camera/",
+        "--vis",
+        "wandb",
+      ]
+    },
     // {
     //   "name": "render",
     //   "type": "python",

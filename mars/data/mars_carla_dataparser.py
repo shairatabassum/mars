@@ -253,8 +253,13 @@ def _get_scene_objects(basedir):
         vehicle_dim = object_pose[np.where(object_pose[:, 2] == track_id), :][0, 0, 4:7]
         # For vkitti2 dimensions are defined: width height length
         # To Match vehicle axis xyz swap to length, height, width
-        vehicle_dim = vehicle_dim[[1, 0, 2]]
         # vehicle_dim = vehicle_dim[[2, 0, 1]]
+        
+        # height width length
+        vehicle_dim = vehicle_dim[[1, 0, 2]]
+        # vehicle_dim[[0]] = vehicle_dim[[0]]*0.8
+        
+        
 
         # vehicle = np.concatenate((np.concatenate((np.concatenate((track_id, label)), model)), color))
         vehicle = np.concatenate([track_id, vehicle_dim])
@@ -279,11 +284,15 @@ def _get_scene_objects(basedir):
     # Add to object_pose if the object is moving between the current and the next frame
     # TODO: Use if moving information to decide if an Object is static or dynamic across the whole scene!!
     object_pose = np.column_stack((object_pose, bbox[:, -1]))
+    
+    # counting number of camera
+    rgb_dir = os.path.join(basedir, "frames/rgb")
+    n_cam = len(os.listdir(rgb_dir))
 
     # Store 2D bounding boxes of frames
     bboxes_by_frame = []
     last_frame = bbox[-1, 0].astype(np.int32)
-    for cam in range(2):
+    for cam in range(n_cam):
         for i in range(last_frame + 1):
             bbox_at_i = np.squeeze(bbox[np.argwhere(bbox[:, 0] == i), :7])
             bboxes_by_frame.append(bbox_at_i[np.argwhere(bbox_at_i[:, 1] == cam), 3:7])
@@ -328,13 +337,13 @@ class MarsCarlaDataParserConfig(DataParserConfig):
     """Directory specifying location of data."""
     scale_factor: float = 0.015 #0.09 #0.015
     """How much to scale the camera origins by."""
-    scene_scale: float = 1.3
+    scene_scale: float = 2.0
     """How much to scale the region of interest by."""
     alpha_color: str = "white"
     """alpha color of background"""
-    first_frame: int = 0
+    first_frame: int = 464
     """specifies the beginning of a sequence if not the complete scene is taken as Input"""
-    last_frame: int = 102
+    last_frame: int = 577
     """specifies the end of a sequence"""
     use_object_properties: bool = True
     """ use pose and properties of visible objects as an input """

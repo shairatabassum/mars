@@ -17,6 +17,7 @@ import cv2
 import mediapy as media
 import numpy as np
 import torch
+import math
 import tyro
 from rich.console import Console
 from rich.progress import (
@@ -352,6 +353,34 @@ class RenderTrajectory:
         FOV = torch.tensor(([30, 26, 22]), dtype=torch.float32)
         # camera_path = pipeline.datamanager.eval_dataset.cameras
         camera_path = pipeline.datamanager.train_dataset.cameras
+        
+        
+        ##########################################
+        ### MAKING MODIFICATION FROM HERE
+        # camera_path.camera_to_worlds[:, 2, 3] += 0.01
+        # camera_path.camera_to_worlds[:, 0, 3] += 0.01
+        
+        
+        # deg_rotate = math.radians(10)
+        # rotation_matrix = torch.tensor([
+        #     [math.cos(deg_rotate), 0, math.sin(deg_rotate)],
+        #     [0, 1, 0],
+        #     [-math.sin(deg_rotate), 0, math.cos(deg_rotate)]
+        # ])
+        
+        # camera_poses_tensor = camera_path.camera_to_worlds
+        
+        # for i in range(camera_poses_tensor.shape[0]):
+        #     # Get the 4x4 matrix
+        #     current_matrix = camera_poses_tensor[i]
+        #     new_matrix = torch.matmul(current_matrix[:, :3], rotation_matrix.T)
+        #     # camera_poses_tensor[i] = new_matrix
+        #     camera_path.camera_to_worlds[i,:,:3] = new_matrix
+        
+        ### UPTO HERE
+        ##########################################
+        
+        
         render_width = int(camera_path.cx[0] * 2)
         render_height = int(camera_path.cy[0] * 2)
         seconds = 13

@@ -79,8 +79,8 @@ def camera_intrinsics(data_dir, transform_dir, cam_num):
             #fy = width / (2 * np.tan(fov_rad / 2))
             f.write(f"{frameID} 0 {fx} {fy} {cx} {cy}\n")
             cameraID+=1
-            #f.write(f"{frameID} 1 {fx} {fy} {cx} {cy}\n")
-            #cameraID+=1
+            f.write(f"{frameID} 1 {fx} {fy} {cx} {cy}\n")
+            cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0
                 frameID+=1
@@ -112,8 +112,8 @@ def camera_extrinsics(data_dir, cam_num):
             ext = ' '.join(matrix)
             file.write(f"{frameID} 0 {ext}\n")
             cameraID+=1
-            #file.write(f"{frameID} 1 {ext}\n")
-            #cameraID+=1
+            file.write(f"{frameID} 1 {ext}\n")
+            cameraID+=1
             if cameraID == cam_num:
                 cameraID = 0
                 frameID+=1

@@ -34,6 +34,7 @@ from typing_extensions import Literal
 
 from mars.model_components.losses import monosdf_depth_loss
 from mars.models.nerfacto import NerfactoModel, NerfactoModelConfig
+from mars.models.zipnerf import ZipNeRFModel, ZipNeRFModelConfig
 from mars.models.semantic_nerfw import SemanticNerfWModel
 from mars.models.sky_model import SkyModelConfig
 from mars.utils.neural_scene_graph_helper_opengl import box_pts, combine_z, world2object
@@ -78,8 +79,8 @@ class SceneGraphModelConfigOpenGL(ModelConfig):
 
     _target: Type = field(default_factory=lambda: SceneGraphModel)
     # background_model: ModelConfig = VanillaModelConfig(_target=NeRFModel)
-    background_model: ModelConfig = NerfactoModelConfig()
-    object_model_template: ModelConfig = NerfactoModelConfig()
+    background_model: ModelConfig = ZipNeRFModelConfig()
+    object_model_template: ModelConfig = ZipNeRFModelConfig()
 
     max_num_obj: int = -1
     ray_add_input_rows: int = -1
@@ -305,7 +306,7 @@ class SceneGraphModel(Model):
 
         if self.config.use_interlevel_loss and self.training:
             if isinstance(self.background_model, NerfactoModel) or isinstance(
-                self.background_model, SemanticNerfWModel
+                self.background_model, SemanticNerfWModel) or isinstance(self.background_model, ZipNeRFModel
             ):
                 output["interlevel_loss"] = interlevel_loss(raw_output["weights_list"], raw_output["ray_samples_list"])
             else:
@@ -371,6 +372,7 @@ class SceneGraphModel(Model):
             if (
                 isinstance(self.background_model, NerfactoModel)
                 or isinstance(self.background_model, SemanticNerfWModel)
+                or isinstance(self.background_model, ZipNeRFModel)
             )
             and self.config.use_interlevel_loss
             else 0.0
@@ -446,7 +448,7 @@ class SceneGraphModel(Model):
 
             interlevel_obj = (
                 interlevel_loss(result["weights_list"], result["ray_samples_list"])
-                if isinstance(model, NerfactoModel) and self.config.use_interlevel_loss
+                if (isinstance(model, NerfactoModel) or isinstance(model, ZipNeRFModel)) and self.config.use_interlevel_loss
                 else 0.0
             )
             interlevels.append(interlevel_obj)
